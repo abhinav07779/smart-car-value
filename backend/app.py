@@ -52,6 +52,16 @@ async def health_check():
         model_loaded=model_service.is_model_loaded()
     )
 
+@app.get("/", tags=["Root"])
+async def root():
+    """Root endpoint with API information"""
+    return {
+        "message": "Car Price Prediction API", 
+        "status": "running",
+        "version": API_VERSION,
+        "docs": "/docs"
+    }
+
 @app.post("/predict", response_model=PredictionResponse, tags=["Prediction"])
 async def predict_price(car_data: CarData):
     """Predict car price based on input features"""
