@@ -23,7 +23,11 @@ ALLOWED_ORIGINS: List[str] = [
     "http://localhost:8081", 
     "http://127.0.0.1:8081",
     "http://localhost:5173",  # Vite default port
-    "http://127.0.0.1:5173"
+    "http://127.0.0.1:5173",
+    # Production domains
+    "https://*.vercel.app",
+    "https://*.netlify.app",
+    "https://*.github.io"
 ]
 
 # Model Configuration
