@@ -29,7 +29,7 @@ const Index = () => {
               <span className="block text-primary-glow">Machine Learning</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto">
-              Advanced regression model trained on automotive data to predict accurate selling prices 
+              Advanced gradient-boosted trees (XGBoost) model trained on automotive data to predict accurate selling prices 
               using brand, year, mileage, and technical specifications
             </p>
             
@@ -37,9 +37,9 @@ const Index = () => {
               <Card className="bg-white/10 backdrop-blur border-white/20">
                 <CardContent className="p-6 text-center">
                   <Brain className="h-12 w-12 mx-auto mb-4 text-primary-glow" />
-                  <h3 className="text-lg font-semibold mb-2">Regression Analysis</h3>
+                  <h3 className="text-lg font-semibold mb-2">XGBoost Model</h3>
                   <p className="text-sm text-gray-200">
-                    Random Forest & Linear Regression algorithms for accurate price predictions
+                    Gradient-boosted trees (XGBoost) for high-accuracy car price predictions
                   </p>
                 </CardContent>
               </Card>
