@@ -39,6 +39,11 @@ class PredictResponse(BaseModel):
     r2Score: Optional[float] = None
 
 
+@app.get("/")
+async def root():
+    return {"message": "Car Price Prediction API", "status": "running", "docs": "/docs"}
+
+
 @app.get("/health")
 async def health():
     return {"status": "ok"}
@@ -149,3 +154,4 @@ async def predict(req: PredictRequest):
         rmse=None,
         r2Score=None,
     )
+
