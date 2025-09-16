@@ -121,14 +121,32 @@ const stateCitiesData: { [key: string]: string[] } = {
 // Top 3 car price comparison resources for Indian market (OLX as main preference)
 const carPriceResources = [
   {
+    name: "OLX Autos",
+    url: "https://www.olx.in",
+    description: "India's most popular classified platform with extensive car listings",
+    rating: 4.6,
+    features: ["Direct seller contact", "Price negotiation", "Local listings"],
+    icon: "📱",
+    searchUrl: (brand: string, model: string) => `https://www.olx.in/cars_c84?q=${encodeURIComponent(brand)}+${encodeURIComponent(model)}`,
+    isMain: true
+  },
+  {
     name: "CarDekho",
     url: "https://www.cardekho.com",
-    description: "Search used car listings on CarDekho by brand and model",
+    description: "Verified used car listings with detailed filters",
     rating: 4.8,
     features: ["Verified sellers", "Price comparison", "EMI calculator"],
     icon: "🚗",
-    searchUrl: (brand: string, model: string) => `https://www.cardekho.com/used-cars+${brand.toLowerCase().replace(/\s+/g, '-') }+${model.toLowerCase().replace(/\s+/g, '-')}`,
-    isMain: true
+    searchUrl: (brand: string, model: string) => `https://www.cardekho.com/used-cars+${brand.toLowerCase().replace(/\s+/g, '-') }+${model.toLowerCase().replace(/\s+/g, '-')}`
+  },
+  {
+    name: "Cars24",
+    url: "https://www.cars24.com",
+    description: "Instant buying platform with inspections and warranties",
+    rating: 4.5,
+    features: ["Inspected cars", "Quick purchase", "Warranty options"],
+    icon: "⚡",
+    searchUrl: (brand: string, model: string) => `https://www.cars24.com/buy-used-cars/${brand.toLowerCase().replace(/\s+/g, '-')}/${model.toLowerCase().replace(/\s+/g, '-')}`
   }
 ];
 
