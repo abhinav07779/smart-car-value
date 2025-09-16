@@ -1,0 +1,35 @@
+{
+  "best_model": "XGBRegressor",
+  "metrics": [
+    {
+      "model": "LinearRegression",
+      "rmse": 543925309348214.75,
+      "mae": 36992027700350.45,
+      "r2": -2.3009175450217114e+18
+    },
+    {
+      "model": "RandomForest",
+      "rmse": 136576.07639507772,
+      "mae": 88734.58564973004,
+      "r2": 0.854931946136605
+    },
+    {
+      "model": "XGBRegressor",
+      "rmse": 130350.11536358682,
+      "mae": 86414.59568883067,
+      "r2": 0.8678566353657183
+    }
+  ],
+  "features": {
+    "numeric": [
+      "modelYear",
+      "mileage"
+    ],
+    "categorical": [
+      "oem",
+      "model",
+      "ft",
+      "transmission"
+    ]
+  }
+}

@@ -170,6 +170,9 @@ export const CarPricePredictor = () => {
   const [availableModels, setAvailableModels] = useState<string[]>([]);
   const [selectedCurrency, setSelectedCurrency] = useState('INR');
   const [availableCities, setAvailableCities] = useState<string[]>([]);
+  const [usedBackend, setUsedBackend] = useState<boolean | null>(null);
+  const [apiUrlUsed, setApiUrlUsed] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   // Update available models when brand changes
   useEffect(() => {
@@ -196,9 +199,11 @@ export const CarPricePredictor = () => {
   // Real ML API prediction
   const predictPrice = async () => {
     setIsLoading(true);
+    setErrorMessage(null);
     
     try {
       const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8002";
+      setApiUrlUsed(apiUrl);
       const response = await fetch(`${apiUrl}/predict`, {
         method: "POST",
         headers: { 
@@ -208,7 +213,8 @@ export const CarPricePredictor = () => {
       });
 
       if (!response.ok) {
-        throw new Error(`API Error: ${response.status}`);
+        const text = await response.text().catch(() => "");
+        throw new Error(`API ${response.status} ${text ? `- ${text}` : ''}`.trim());
       }
 
       const result = await response.json();
@@ -219,36 +225,13 @@ export const CarPricePredictor = () => {
         rmse: result.rmse,
         r2Score: result.r2Score
       });
+      setUsedBackend(true);
       
     } catch (error) {
       console.error("Prediction error:", error);
-      
-      // Fallback to simulation if API is not available
-      console.log("API unavailable, using fallback prediction...");
-      
-      const brandMultiplier = getBrandMultiplier(carData.brand);
-      const yearFactor = Math.max(0.4, (carData.year - 1995) / 25);
-      const kmFactor = Math.max(0.2, 1 - (carData.kmDriven / 300000));
-      const fuelTypeFactor = getFuelTypeFactor(carData.fuelType);
-      const transmissionFactor = carData.transmission === "Automatic" ? 1.08 : 0.95;
-      const engineFactor = Math.min(1.4, Math.max(0.7, carData.engineSize / 1.8));
-      const locationFactor = getLocationFactor(carData.city, carData.state);
-      const cngFactor = carData.cngKit ? 0.95 : 1.0;
-      const qualityFactor = Math.max(0.6, carData.qualityScore / 10);
-      
-      const basePrice = 600000;
-      const predictedPrice = Math.round(
-        basePrice * brandMultiplier * yearFactor * kmFactor * 
-        fuelTypeFactor * transmissionFactor * engineFactor * 
-        locationFactor * cngFactor * qualityFactor
-      );
-
-      setPrediction({
-        predictedPrice,
-        confidence: Math.round((85 + Math.random() * 10)),
-        rmse: Math.round(75000 + Math.random() * 25000),
-        r2Score: +(0.85 + Math.random() * 0.1).toFixed(3)
-      });
+      setUsedBackend(false);
+      setErrorMessage(error instanceof Error ? error.message : "Prediction failed");
+      setPrediction(null);
     }
     
     setIsLoading(false);
@@ -554,9 +537,16 @@ export const CarPricePredictor = () => {
                   <div className="text-3xl font-bold text-primary mb-2">
                     {formatCurrency(convertPrice(prediction.predictedPrice, selectedCurrency), selectedCurrency)}
                   </div>
-                  <Badge variant="secondary" className="text-sm">
-                    {prediction.confidence}% Confidence
-                  </Badge>
+                  <div className="flex items-center justify-center gap-2">
+                    <Badge variant="secondary" className="text-sm">
+                      {prediction.confidence}% Confidence
+                    </Badge>
+                    {usedBackend !== null && (
+                      <Badge variant={usedBackend ? "default" : "destructive"} className="text-xs">
+                        {usedBackend ? "Source: ML API" : "Source: Fallback"}
+                      </Badge>
+                    )}
+                  </div>
                 </div>
 
                 {/* Multi-Currency Display */}
@@ -614,6 +604,9 @@ export const CarPricePredictor = () => {
               <div className="text-center py-12 text-muted-foreground">
                 <Car className="h-12 w-12 mx-auto mb-4 opacity-50" />
                 <p>Enter car details and click "Predict Price" to see the estimated value</p>
+                {errorMessage && (
+                  <p className="mt-2 text-red-600 text-sm">{errorMessage}{apiUrlUsed ? ` (API: ${apiUrlUsed})` : ''}</p>
+                )}
               </div>
             )}
           </CardContent>

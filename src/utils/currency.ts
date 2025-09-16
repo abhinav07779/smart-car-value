@@ -39,6 +39,25 @@ export const currencyNames = {
   BRL: 'Brazilian Real'
 };
 
+// Format INR in Indian market terms (Lakhs/Crore) for better readability
+function formatINRCompact(amount: number): string {
+  const symbol = currencySymbols.INR;
+  const crore = 10000000; // 1 Cr
+  const lakh = 100000; // 1 Lakh
+
+  if (amount >= crore) {
+    const value = amount / crore;
+    return `${symbol}${value.toFixed(2)} Cr`;
+  }
+
+  if (amount >= lakh) {
+    const value = amount / lakh;
+    return `${symbol}${value.toFixed(2)} Lakh`;
+  }
+
+  return `${symbol}${Math.round(amount).toLocaleString('en-IN')}`;
+}
+
 export function convertPrice(inrPrice: number, targetCurrency: string): number {
   const rate = currencyRates[targetCurrency as keyof typeof currencyRates];
   return Math.round(inrPrice * rate);
@@ -46,12 +65,16 @@ export function convertPrice(inrPrice: number, targetCurrency: string): number {
 
 export function formatCurrency(amount: number, currency: string): string {
   const symbol = currencySymbols[currency as keyof typeof currencySymbols];
-  
-  // Special formatting for currencies
-  if (currency === 'JPY' || currency === 'CNY' || currency === 'INR') {
+  // Special formatting for INR using Lakhs/Cr and grouping for others as needed
+  if (currency === 'INR') {
+    return formatINRCompact(amount);
+  }
+
+  // Whole-number currencies
+  if (currency === 'JPY' || currency === 'CNY') {
     return `${symbol}${Math.round(amount).toLocaleString()}`;
   }
-  
+
   return `${symbol}${amount.toLocaleString()}`;
 }
 

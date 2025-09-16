@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ScatterChart, Scatter, BarChart, Bar } from "recharts";
@@ -49,6 +49,40 @@ const mileageVsPriceData = mockDataset.map(car => ({
 
 export const DatasetVisualization = () => {
   const [selectedCurrency, setSelectedCurrency] = useState('INR');
+  const [health, setHealth] = useState<{ status: string; model_loaded: boolean } | null>(null);
+  const [modelInfo, setModelInfo] = useState<{
+    model_metrics: { rmse: number; r2_score: number; mae?: number };
+    training_date: string;
+    features_count: number;
+    categorical_features: string[];
+    numerical_features: string[];
+  } | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchInfo = async () => {
+      setLoading(true);
+      setError(null);
+      try {
+        const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8002";
+        const [hRes, miRes] = await Promise.all([
+          fetch(`${apiUrl}/health`),
+          fetch(`${apiUrl}/model-info`)
+        ]);
+        if (hRes.ok) setHealth(await hRes.json());
+        if (miRes.ok) setModelInfo(await miRes.json());
+        if (!hRes.ok || !miRes.ok) {
+          throw new Error(`API ${!hRes.ok ? 'health' : ''} ${!miRes.ok ? 'model-info' : ''} failed`);
+        }
+      } catch (e) {
+        setError(e instanceof Error ? e.message : 'Failed to load model info');
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchInfo();
+  }, []);
   
   // Get currency-converted data
   const priceByYearConverted = getMultiCurrencyData(priceByYearData, selectedCurrency);
@@ -84,7 +118,7 @@ export const DatasetVisualization = () => {
         </CardContent>
       </Card>
 
-      {/* Dataset Overview */}
+      {/* Dataset Overview (Live from backend) */}
       <Card className="shadow-card">
         <CardHeader>
           <CardTitle className="flex items-center gap-2">
@@ -93,28 +127,34 @@ export const DatasetVisualization = () => {
           </CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
-            <div className="text-center p-4 bg-gradient-card rounded-lg">
-              <div className="text-2xl font-bold text-primary">1,247</div>
-              <div className="text-sm text-muted-foreground">Total Records</div>
-            </div>
-            <div className="text-center p-4 bg-gradient-card rounded-lg">
-              <div className="text-2xl font-bold text-primary">7</div>
-              <div className="text-sm text-muted-foreground">Features</div>
-            </div>
-            <div className="text-center p-4 bg-gradient-card rounded-lg">
-              <div className="text-2xl font-bold text-primary">85.6%</div>
-              <div className="text-sm text-muted-foreground">Training Accuracy</div>
-            </div>
-            <div className="text-center p-4 bg-gradient-card rounded-lg">
-              <div className="text-2xl font-bold text-primary">
-                {formatCurrency(convertPrice(210000, selectedCurrency), selectedCurrency)}
+          {loading ? (
+            <div className="text-sm text-muted-foreground">Loading model info…</div>
+          ) : error ? (
+            <div className="text-sm text-red-600">{error}</div>
+          ) : modelInfo ? (
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-6">
+              <div className="text-center p-4 bg-gradient-card rounded-lg">
+                <div className="text-2xl font-bold text-primary">{modelInfo.features_count}</div>
+                <div className="text-sm text-muted-foreground">Total Features</div>
               </div>
-              <div className="text-sm text-muted-foreground">Avg RMSE</div>
+              <div className="text-center p-4 bg-gradient-card rounded-lg">
+                <div className="text-2xl font-bold text-primary">{modelInfo.categorical_features.length + modelInfo.numerical_features.length}</div>
+                <div className="text-sm text-muted-foreground">Used Columns</div>
+              </div>
+              <div className="text-center p-4 bg-gradient-card rounded-lg">
+                <div className="text-2xl font-bold text-primary">{(modelInfo.model_metrics.r2_score * 100).toFixed(2)}%</div>
+                <div className="text-sm text-muted-foreground">R² (variance explained)</div>
+              </div>
+              <div className="text-center p-4 bg-gradient-card rounded-lg">
+                <div className="text-2xl font-bold text-primary">{formatCurrency(convertPrice(modelInfo.model_metrics.rmse, selectedCurrency), selectedCurrency)}</div>
+                <div className="text-sm text-muted-foreground">RMSE</div>
+              </div>
             </div>
-          </div>
+          ) : (
+            <div className="text-sm text-muted-foreground">Model info unavailable</div>
+          )}
 
-          {/* Sample Data Table */}
+          {/* Sample Data Table (static example) */}
           <div className="overflow-x-auto">
             <div className="text-sm font-medium mb-2">Sample Training Data:</div>
             <table className="w-full text-sm">

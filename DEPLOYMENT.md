@@ -1,124 +1,65 @@
-# 🚀 Free Deployment Guide
+# 🚀 Deployment Guide
 
-## Option 1: Vercel + Railway (Recommended)
+## Quick Deploy (Recommended: Vercel + Railway)
 
-### Frontend Deployment (Vercel)
+### 1. Frontend on Vercel
+1. Push code to GitHub
+2. Go to [vercel.com](https://vercel.com)
+3. Import your GitHub repository
+4. Vercel will auto-detect Vite React app
+5. Add environment variable: `VITE_API_URL` = `https://your-backend-url.railway.app`
 
-1. **Push to GitHub** (if not already):
-   ```bash
-   git add .
-   git commit -m "Prepare for deployment"
-   git push origin main
-   ```
+### 2. Backend on Railway
+1. Go to [railway.app](https://railway.app)
+2. Create new project from GitHub
+3. Railway will auto-detect Python app
+4. Copy the generated URL
+5. Update `VITE_API_URL` in Vercel with Railway URL
 
-2. **Deploy to Vercel**:
-   - Go to [vercel.com](https://vercel.com)
-   - Sign up with GitHub
-   - Click "New Project"
-   - Import your repository
-   - Vercel will auto-detect it's a Vite app
-   - Click "Deploy"
+### 3. Test Deployment
+- Frontend: `https://your-app.vercel.app`
+- Backend API: `https://your-app.railway.app`
+- API Docs: `https://your-app.railway.app/docs`
 
-3. **Get your Vercel URL** (e.g., `https://your-app.vercel.app`)
+## Alternative: Render (All-in-One)
 
-### Backend Deployment (Railway)
+### Backend on Render
+1. Create "Web Service" on Render
+2. Connect GitHub repository
+3. Build: `cd backend && pip install -r requirements.txt`
+4. Start: `cd backend && uvicorn app:app --host 0.0.0.0 --port $PORT`
 
-1. **Go to Railway**:
-   - Visit [railway.app](https://railway.app)
-   - Sign up with GitHub
+### Frontend on Render
+1. Create "Static Site" on Render
+2. Connect GitHub repository
+3. Build: `npm install && npm run build`
+4. Publish: `dist`
 
-2. **Create New Project**:
-   - Click "New Project"
-   - Select "Deploy from GitHub repo"
-   - Choose your repository
+## Environment Variables
 
-3. **Configure Railway**:
-   - Railway will auto-detect Python
-   - Set the root directory to `/` (not `/backend`)
-   - Railway will use the `Procfile` and `railway.json`
+### Frontend (Vercel/Render)
+- `VITE_API_URL`: Your backend API URL
 
-4. **Get your Railway URL** (e.g., `https://your-backend.railway.app`)
+### Backend (Railway/Render)
+- No additional environment variables needed for basic deployment
 
-### Update Frontend with Backend URL
+## Troubleshooting
 
-1. **In Vercel Dashboard**:
-   - Go to your project settings
-   - Add environment variable:
-     - Key: `VITE_API_URL`
-     - Value: `https://your-backend.railway.app`
+### Common Issues:
+1. **CORS errors**: Backend already configured for all origins
+2. **Model not found**: Ensure `backend/models/` folder is committed
+3. **Build failures**: Check Python version (3.13+) and dependencies
 
-2. **Redeploy**:
-   - Trigger a new deployment in Vercel
+### Health Check:
+- Backend: `GET /health` should return `{"status": "ok"}`
+- Frontend: Should load without console errors
 
-## Option 2: Netlify + Railway
+## Cost Estimation
+- **Vercel**: Free tier (100GB bandwidth/month)
+- **Railway**: Free tier (500 hours/month) or $5/month
+- **Render**: Free tier (750 hours/month) or $7/month
 
-### Frontend (Netlify)
-
-1. **Build locally**:
-   ```bash
-   npm run build
-   ```
-
-2. **Deploy to Netlify**:
-   - Go to [netlify.com](https://netlify.com)
-   - Drag and drop your `dist` folder
-   - Or connect your GitHub repo
-
-3. **Set environment variable**:
-   - In Netlify dashboard → Site settings → Environment variables
-   - Add `VITE_API_URL` = `https://your-backend.railway.app`
-
-## Option 3: GitHub Pages + Render
-
-### Frontend (GitHub Pages)
-
-1. **Update vite.config.ts**:
-   ```typescript
-   export default defineConfig({
-     base: '/your-repo-name/',
-     // ... rest of config
-   })
-   ```
-
-2. **Enable GitHub Pages**:
-   - Go to repository settings
-   - Scroll to "Pages" section
-   - Select "Deploy from a branch"
-   - Choose `gh-pages` branch
-
-3. **Deploy**:
-   ```bash
-   npm run build
-   npm install -g gh-pages
-   gh-pages -d dist
-   ```
-
-### Backend (Render)
-
-1. **Go to Render**:
-   - Visit [render.com](https://render.com)
-   - Sign up with GitHub
-
-2. **Create Web Service**:
-   - Connect your repository
-   - Set build command: `pip install -r requirements.txt`
-   - Set start command: `uvicorn backend.app:app --host 0.0.0.0 --port $PORT`
-
-## 🎯 Recommended: Vercel + Railway
-
-This combination offers:
-- ✅ **100% Free** (generous limits)
-- ✅ **Easy setup** (5 minutes)
-- ✅ **Automatic deployments** (Git push = deploy)
-- ✅ **Custom domains** (free)
-- ✅ **Great performance**
-- ✅ **No credit card required**
-
-## 📝 Final Steps
-
-1. **Test your deployed app**
-2. **Share the Vercel URL** with others
-3. **Monitor usage** in both dashboards
-4. **Set up custom domain** (optional)
-
-Your car price prediction app will be live and accessible worldwide! 🌍
+## Custom Domain
+1. Add custom domain in Vercel/Render settings
+2. Update `VITE_API_URL` if needed
+3. Configure DNS records as instructed
