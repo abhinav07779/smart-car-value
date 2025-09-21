@@ -118,6 +118,161 @@ const stateCitiesData: { [key: string]: string[] } = {
   "Odisha": ["Bhubaneswar", "Cuttack", "Rourkela", "Berhampur", "Sambalpur"]
 };
 
+// Helper function to format brand and model names for CarDekho URLs
+const formatCarDekhoUrl = (brand: string, model: string): string => {
+  // Brand mapping for CarDekho specific naming conventions
+  const brandMapping: { [key: string]: string } = {
+    "Maruti Suzuki": "maruti-suzuki",
+    "Hyundai": "hyundai",
+    "Tata": "tata",
+    "Mahindra": "mahindra",
+    "Toyota": "toyota",
+    "Honda": "honda",
+    "Ford": "ford",
+    "Volkswagen": "volkswagen",
+    "Skoda": "skoda",
+    "Nissan": "nissan",
+    "Renault": "renault",
+    "Kia": "kia",
+    "BMW": "bmw",
+    "Mercedes": "mercedes-benz",
+    "Audi": "audi"
+  };
+
+  // Model mapping for specific CarDekho model names
+  const modelMapping: { [key: string]: string } = {
+    "Swift Dzire": "swift-dzire",
+    "Grand i10": "grand-i10",
+    "Grand i10 Nios": "grand-i10-nios",
+    "i20 N Line": "i20-n-line",
+    "XUV300": "xuv300",
+    "XUV400": "xuv400",
+    "XUV700": "xuv700",
+    "Scorpio N": "scorpio-n",
+    "Bolero Neo": "bolero-neo",
+    "Innova Crysta": "innova-crysta",
+    "Innova HyCross": "innova-hycross",
+    "Land Cruiser": "land-cruiser",
+    "Corolla Altis": "corolla-altis",
+    "Etios Liva": "etios-liva",
+    "WR-V": "wr-v",
+    "BR-V": "br-v",
+    "EcoSport": "ecosport",
+    "Endeavour": "endeavour",
+    "Freestyle": "freestyle",
+    "Territory": "territory",
+    "Virtus": "virtus",
+    "Taigun": "taigun",
+    "Tiguan": "tiguan",
+    "T-Roc": "t-roc",
+    "ID.4": "id4",
+    "Slavia": "slavia",
+    "Kushaq": "kushaq",
+    "Kodiaq": "kodiaq",
+    "Superb": "superb",
+    "Octavia": "octavia",
+    "Fabia": "fabia",
+    "Laura": "laura",
+    "Yeti": "yeti",
+    "Kamiq": "kamiq",
+    "Terrano": "terrano",
+    "Kicks": "kicks",
+    "Magnite": "magnite",
+    "GT-R": "gt-r",
+    "370Z": "370z",
+    "Pathfinder": "pathfinder",
+    "X-Trail": "x-trail",
+    "Navara": "navara",
+    "Triber": "triber",
+    "Duster": "duster",
+    "Captur": "captur",
+    "Lodgy": "lodgy",
+    "Scala": "scala",
+    "Pulse": "pulse",
+    "Fluence": "fluence",
+    "Koleos": "koleos",
+    "Kiger": "kiger",
+    "Seltos": "seltos",
+    "Sonet": "sonet",
+    "Carens": "carens",
+    "Carnival": "carnival",
+    "EV6": "ev6",
+    "Stonic": "stonic",
+    "Rio": "rio",
+    "Optima": "optima",
+    "Sportage": "sportage",
+    "Sorento": "sorento",
+    "1 Series": "1-series",
+    "2 Series": "2-series",
+    "3 Series": "3-series",
+    "4 Series": "4-series",
+    "5 Series": "5-series",
+    "6 Series": "6-series",
+    "7 Series": "7-series",
+    "8 Series": "8-series",
+    "A-Class": "a-class",
+    "B-Class": "b-class",
+    "C-Class": "c-class",
+    "E-Class": "e-class",
+    "S-Class": "s-class",
+    "CLA": "cla",
+    "CLS": "cls",
+    "GLA": "gla",
+    "GLB": "glb",
+    "GLC": "glc",
+    "GLE": "gle",
+    "GLS": "gls",
+    "G-Class": "g-class",
+    "AMG GT": "amg-gt",
+    "EQC": "eqc",
+    "EQS": "eqs",
+    "EQA": "eqa",
+    "EQB": "eqb",
+    "EQE": "eqe",
+    "EQS SUV": "eqs-suv",
+    "Q2": "q2",
+    "Q3": "q3",
+    "Q4 e-tron": "q4-etron",
+    "Q5": "q5",
+    "Q7": "q7",
+    "Q8": "q8",
+    "TT": "tt",
+    "R8": "r8",
+    "e-tron": "etron",
+    "e-tron GT": "etron-gt",
+    "RS3": "rs3",
+    "RS4": "rs4",
+    "RS5": "rs5",
+    "RS6": "rs6",
+    "RS7": "rs7",
+    "RS Q8": "rs-q8"
+  };
+
+  const formattedBrand = brandMapping[brand] || brand.toLowerCase().replace(/\s+/g, '-');
+  const formattedModel = modelMapping[model] || model.toLowerCase().replace(/\s+/g, '-');
+  
+  // Generate multiple URL patterns for better coverage
+  const urlPatterns = [
+    // Most specific: Direct car model page
+    `https://www.cardekho.com/carmodels/${formattedBrand}/${formattedModel}`,
+    // Used cars with brand/model filter
+    `https://www.cardekho.com/used-cars/${formattedBrand}/${formattedModel}`,
+    // Search with brand and model parameters
+    `https://www.cardekho.com/used-cars?brand=${encodeURIComponent(brand)}&model=${encodeURIComponent(model)}`,
+    // General search fallback
+    `https://www.cardekho.com/used-cars?q=${encodeURIComponent(brand)}+${encodeURIComponent(model)}`
+  ];
+  
+  // Return the most specific URL (carmodels) as primary
+  // This will take users directly to the specific car model page
+  const finalUrl = urlPatterns[0];
+  
+  // Log the generated URL for debugging (remove in production)
+  console.log(`CarDekho URL generated for ${brand} ${model}:`, finalUrl);
+  
+  return finalUrl;
+};
+
 // Top 3 car price comparison resources for Indian market (OLX as main preference)
 const carPriceResources = [
   {
@@ -133,11 +288,11 @@ const carPriceResources = [
   {
     name: "CarDekho",
     url: "https://www.cardekho.com",
-    description: "Verified used car listings with detailed filters",
+    description: "Direct links to specific car model pages with detailed specs",
     rating: 4.8,
-    features: ["Verified sellers", "Price comparison", "EMI calculator"],
+    features: ["Model-specific pages", "Detailed specifications", "Price comparison"],
     icon: "🚗",
-    searchUrl: (brand: string, model: string) => `https://www.cardekho.com/used-cars+${brand.toLowerCase().replace(/\s+/g, '-') }+${model.toLowerCase().replace(/\s+/g, '-')}`
+    searchUrl: formatCarDekhoUrl
   },
   {
     name: "Cars24",
@@ -669,8 +824,9 @@ export const CarPricePredictor = () => {
                           ? 'bg-blue-600 text-white hover:bg-blue-700' 
                           : 'bg-primary text-primary-foreground hover:bg-primary/90'
                       }`}
+                      title={resource.name === "CarDekho" ? `View ${carData.brand} ${carData.model} model page on CarDekho` : `Search for ${carData.brand} ${carData.model} on ${resource.name}`}
                     >
-                      {resource.isMain ? 'Search Now' : 'Search'}
+                      {resource.isMain ? 'Search Now' : (resource.name === "CarDekho" ? 'View Model' : 'Search')}
                       <ExternalLink className="h-3 w-3" />
                     </a>
                   </div>
@@ -681,7 +837,7 @@ export const CarPricePredictor = () => {
                   <Shield className="h-4 w-4 text-blue-600 mt-0.5" />
                   <div>
                     <p className="font-medium text-blue-800">Pro Tip:</p>
-                    <p>Start with <strong>OLX Autos</strong> for the best local deals and direct seller contact. Then compare with CarDekho and Cars24 for verified listings and instant valuations.</p>
+                    <p>Start with <strong>OLX Autos</strong> for the best local deals and direct seller contact. <strong>CarDekho</strong> takes you directly to the specific {carData.brand} {carData.model} model page with detailed specifications. Then compare with Cars24 for instant valuations.</p>
                   </div>
                 </div>
               </div>

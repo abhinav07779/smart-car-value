@@ -24,13 +24,17 @@ app.add_middleware(
 )
 
 class PredictRequest(BaseModel):
-    make: Optional[str] = None
+    brand: Optional[str] = None
     model: Optional[str] = None
     year: Optional[float] = None
-    mileage: Optional[float] = None
-    fuel_type: Optional[str] = None
+    kmDriven: Optional[float] = None
+    fuelType: Optional[str] = None
     transmission: Optional[str] = None
-    engine_size: Optional[float] = None
+    engineSize: Optional[float] = None
+    city: Optional[str] = None
+    state: Optional[str] = None
+    cngKit: Optional[bool] = None
+    qualityScore: Optional[float] = None
 
 class PredictResponse(BaseModel):
     predictedPrice: float
@@ -79,13 +83,13 @@ async def model_info():
 
 
 ALIASES: Dict[str, List[str]] = {
-    "make": ["make", "brand", "oem", "Make", "Brand"],
+    "brand": ["brand", "make", "oem", "Make", "Brand"],
     "model": ["model", "Model"],
     "year": ["year", "modelYear", "Registration Year", "Year", "year_of_manufacture"],
-    "mileage": ["mileage", "km", "kms_driven", "Kms Driven", "kilometers_driven"],
-    "fuel_type": ["fuel_type", "Fuel Type", "ft", "fuel"],
+    "kmDriven": ["kmDriven", "mileage", "km", "kms_driven", "Kms Driven", "kilometers_driven"],
+    "fuelType": ["fuelType", "fuel_type", "Fuel Type", "ft", "fuel"],
     "transmission": ["transmission", "Transmission"],
-    "engine_size": ["engine_size", "Engine Displacement", "engine", "Displacement"],
+    "engineSize": ["engineSize", "engine_size", "Engine Displacement", "engine", "Displacement"],
 }
 
 
@@ -125,13 +129,13 @@ async def predict(req: PredictRequest):
     trained_cols = list(trained_numeric) + list(trained_categorical)
 
     mapping = {
-        pick_trained_name(trained_cols, ALIASES["make"]): req.make,
+        pick_trained_name(trained_cols, ALIASES["brand"]): req.brand,
         pick_trained_name(trained_cols, ALIASES["model"]): req.model,
         pick_trained_name(trained_cols, ALIASES["year"]): coerce_numeric(req.year),
-        pick_trained_name(trained_cols, ALIASES["mileage"]): coerce_numeric(req.mileage),
-        pick_trained_name(trained_cols, ALIASES["fuel_type"]): req.fuel_type,
+        pick_trained_name(trained_cols, ALIASES["kmDriven"]): coerce_numeric(req.kmDriven),
+        pick_trained_name(trained_cols, ALIASES["fuelType"]): req.fuelType,
         pick_trained_name(trained_cols, ALIASES["transmission"]): req.transmission,
-        pick_trained_name(trained_cols, ALIASES["engine_size"]): coerce_numeric(req.engine_size),
+        pick_trained_name(trained_cols, ALIASES["engineSize"]): coerce_numeric(req.engineSize),
     }
 
     # Remove None keys (aliases not used in training)
@@ -148,10 +152,22 @@ async def predict(req: PredictRequest):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Prediction failed: {e}")
 
+    # Get model metrics from info
+    model_metrics = info.get("metrics", [])
+    best_model_metrics = None
+    for metric in model_metrics:
+        if metric.get("model") == info.get("best_model"):
+            best_model_metrics = metric
+            break
+    
+    rmse = best_model_metrics.get("rmse") if best_model_metrics else None
+    r2_score = best_model_metrics.get("r2") if best_model_metrics else None
+    confidence = min(95.0, max(70.0, (r2_score * 100) if r2_score else 85.0))
+
     return PredictResponse(
         predictedPrice=round(yhat, 2),
-        confidence=85.0,
-        rmse=None,
-        r2Score=None,
+        confidence=round(confidence, 1),
+        rmse=round(rmse, 2) if rmse else None,
+        r2Score=round(r2_score, 4) if r2_score else None,
     )
 

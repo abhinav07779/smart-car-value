@@ -8,3 +8,5 @@ PORT = 8000
 ALLOWED_ORIGINS = ["*"]
 
 
+
+

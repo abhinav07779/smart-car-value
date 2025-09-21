@@ -1,6 +1,7 @@
 import { CarPricePredictor } from "@/components/CarPricePredictor";
 import { DatasetVisualization } from "@/components/DatasetVisualization";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Footer } from "@/components/Footer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, ChartBar, Database } from "lucide-react";
@@ -85,6 +86,9 @@ const Index = () => {
           </TabsContent>
         </Tabs>
       </section>
+
+      {/* Footer */}
+      <Footer />
     </div>
   );
 };
