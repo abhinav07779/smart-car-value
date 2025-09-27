@@ -22,6 +22,7 @@ app.add_middleware(
         "https://drive-price-ai-main-lolxgl92z-abhinav07779s-projects.vercel.app",
         "https://drive-price-ai-main-32iq7ghdo-abhinav07779s-projects.vercel.app",
         "https://drive-price-ai-main-n157z8q8e-abhinav07779s-projects.vercel.app",
+        "https://smart-car-value.onrender.com",
         "http://localhost:8080",
         "http://127.0.0.1:8080"
     ],

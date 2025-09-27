@@ -20,6 +20,6 @@
     }
   ],
   "env": {
-    "VITE_API_URL": "https://web-production-b9585.up.railway.app"
+    "VITE_API_URL": "https://smart-car-value.onrender.com"
   }
 }
