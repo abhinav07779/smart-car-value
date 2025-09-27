@@ -65,7 +65,7 @@ export const DatasetVisualization = () => {
       setLoading(true);
       setError(null);
       try {
-        const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+        const apiUrl = import.meta.env.VITE_API_URL || "https://smart-car-value.onrender.com";
         const [hRes, miRes] = await Promise.all([
           fetch(`${apiUrl}/health`),
           fetch(`${apiUrl}/model-info`)

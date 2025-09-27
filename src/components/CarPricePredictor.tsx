@@ -357,7 +357,7 @@ export const CarPricePredictor = () => {
     setErrorMessage(null);
     
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
+      const apiUrl = import.meta.env.VITE_API_URL || "https://smart-car-value.onrender.com";
       setApiUrlUsed(apiUrl);
       const response = await fetch(`${apiUrl}/predict`, {
         method: "POST",
