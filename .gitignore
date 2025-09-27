@@ -120,3 +120,4 @@ dist/
 
 # Dataset files (keep in git for deployment)
 # backend/data/*.csv
+.vercel

@@ -357,7 +357,7 @@ export const CarPricePredictor = () => {
     setErrorMessage(null);
     
     try {
-      const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8002";
+      const apiUrl = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
       setApiUrlUsed(apiUrl);
       const response = await fetch(`${apiUrl}/predict`, {
         method: "POST",
@@ -456,7 +456,7 @@ export const CarPricePredictor = () => {
               <div className="space-y-2">
                 <Label htmlFor="brand">Brand</Label>
                 <Select value={carData.brand} onValueChange={(value) => setCarData({...carData, brand: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger id="brand">
                     <SelectValue placeholder="Select brand" />
                   </SelectTrigger>
                   <SelectContent>
@@ -486,7 +486,7 @@ export const CarPricePredictor = () => {
                   onValueChange={(value) => setCarData({...carData, model: value})}
                   disabled={!carData.brand || availableModels.length === 0}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="model">
                     <SelectValue placeholder={!carData.brand ? "Select brand first" : "Select model"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -530,7 +530,7 @@ export const CarPricePredictor = () => {
               <div className="space-y-2">
                 <Label htmlFor="fuelType">Fuel Type</Label>
                 <Select value={carData.fuelType} onValueChange={(value) => setCarData({...carData, fuelType: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger id="fuelType">
                     <SelectValue placeholder="Select fuel type" />
                   </SelectTrigger>
                   <SelectContent>
@@ -547,7 +547,7 @@ export const CarPricePredictor = () => {
               <div className="space-y-2">
                 <Label htmlFor="transmission">Transmission</Label>
                 <Select value={carData.transmission} onValueChange={(value) => setCarData({...carData, transmission: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger id="transmission">
                     <SelectValue placeholder="Select transmission" />
                   </SelectTrigger>
                   <SelectContent>
@@ -562,7 +562,7 @@ export const CarPricePredictor = () => {
               <div className="space-y-2">
                 <Label htmlFor="state">State</Label>
                 <Select value={carData.state} onValueChange={(value) => setCarData({...carData, state: value})}>
-                  <SelectTrigger>
+                  <SelectTrigger id="state">
                     <SelectValue placeholder="Select state" />
                   </SelectTrigger>
                   <SelectContent>
@@ -592,7 +592,7 @@ export const CarPricePredictor = () => {
                   onValueChange={(value) => setCarData({...carData, city: value})}
                   disabled={!carData.state || availableCities.length === 0}
                 >
-                  <SelectTrigger>
+                  <SelectTrigger id="city">
                     <SelectValue placeholder={!carData.state ? "Select state first" : "Select city"} />
                   </SelectTrigger>
                   <SelectContent>
@@ -647,10 +647,10 @@ export const CarPricePredictor = () => {
               </Label>
             </div>
 
-            <div className="space-y-2">
+              <div className="space-y-2">
               <Label htmlFor="currency">Display Currency</Label>
               <Select value={selectedCurrency} onValueChange={setSelectedCurrency}>
-                <SelectTrigger>
+                <SelectTrigger id="currency">
                   <SelectValue placeholder="Select currency" />
                 </SelectTrigger>
                 <SelectContent>

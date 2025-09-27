@@ -14,12 +14,19 @@ INFO_PATH = os.path.join(MODELS_DIR, "model_info.json")
 
 app = FastAPI(title="Car Price Prediction API")
 
-# CORS for development: allow all origins
+# CORS configuration for production and development
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=[
+        "*",  # Allow all origins for development
+        "https://drive-price-ai-main-lolxgl92z-abhinav07779s-projects.vercel.app",
+        "https://drive-price-ai-main-32iq7ghdo-abhinav07779s-projects.vercel.app",
+        "https://drive-price-ai-main-n157z8q8e-abhinav07779s-projects.vercel.app",
+        "http://localhost:8080",
+        "http://127.0.0.1:8080"
+    ],
     allow_credentials=False,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
 )
 
