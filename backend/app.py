@@ -60,6 +60,14 @@ async def root():
 async def health():
     return {"status": "ok"}
 
+@app.get("/test-deps")
+async def test_deps():
+    try:
+        import xgboost
+        return {"xgboost": "available", "version": xgboost.__version__}
+    except ImportError as e:
+        return {"xgboost": "not available", "error": str(e)}
+
 
 def load_artifacts():
     if not (os.path.exists(PREPROCESSOR_PATH) and os.path.exists(MODEL_PATH) and os.path.exists(INFO_PATH)):
