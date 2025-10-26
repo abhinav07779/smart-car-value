@@ -1,5 +1,7 @@
+import { Link } from "react-router-dom";
 import { Card, CardContent } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { LegalFooter } from "@/components/LegalDisclaimer";
 import { 
   Car, 
   Brain, 
@@ -166,11 +168,12 @@ export const Footer = () => {
               <span>© 2024 Car Price AI. All rights reserved.</span>
             </div>
             <div className="flex items-center gap-6 text-sm text-gray-400">
-              <a href="#" className="hover:text-primary transition-colors">Privacy Policy</a>
-              <a href="#" className="hover:text-primary transition-colors">Terms of Service</a>
+              <Link to="/privacy-policy" className="hover:text-primary transition-colors">Privacy Policy</Link>
+              <Link to="/terms-and-conditions" className="hover:text-primary transition-colors">Terms of Service</Link>
               <a href="#" className="hover:text-primary transition-colors">API Docs</a>
             </div>
           </div>
+          <LegalFooter />
         </div>
       </div>
     </footer>

@@ -41,6 +41,33 @@ COLUMN_ALIASES = {
     "transmission": ["transmission", "Transmission"],
     # engine size
     "engine_size": ["engine_size", "Engine Displacement", "engine", "Displacement"],
+    # extended categorical features (if present)
+    "variant_trim": ["variant_trim", "variant", "variantName", "Variant", "trim"],
+    "generation_code": ["generation_code", "generation", "gen_code"],
+    "import_type": ["import_type", "importType", "CBU_CKD", "cbu_ckd"],
+    "drivetrain": ["drivetrain", "Drive Type", "drive_type", "AWD_RWD_FWD"],
+    "transmission_detail": ["transmission_detail", "gearbox", "Transmission Detail"],
+    "body_type": ["body_type", "Body Type", "body"],
+    "seats": ["seats", "Seating Capacity"],
+    "adas_level": ["adas_level", "ADAS", "adas"],
+    "airbags": ["airbags", "Airbags"],
+    "air_suspension": ["air_suspension", "Air Suspension"],
+    "sunroof": ["sunroof", "Panoramic Sunroof", "Sunroof"],
+    "branded_audio": ["branded_audio", "Audio Brand"],
+    "owners_count": ["owners_count", "ownerNo", "Owners", "No. of Owners"],
+    "insurance_months_left": ["insurance_months_left", "Insurance Months Left"],
+    "warranty_months_left": ["warranty_months_left", "Warranty Months Left"],
+    "tyre_life_pct": ["tyre_life_pct", "Tyre Life %"],
+    "accident_history": ["accident_history", "Accident History"],
+    "flood_history": ["flood_history", "Flood History"],
+    "odometer_tamper": ["odometer_tamper", "Odometer Tamper"],
+    "service_history_complete": ["service_history_complete", "Service History Complete"],
+    "recall_fixed": ["recall_fixed", "Recall Fixed"],
+    "rto_code": ["rto_code", "RTO", "Registration RTO"],
+    "city": ["City", "city"],
+    "state": ["state", "State"],
+    "ex_showroom_msrp": ["ex_showroom_msrp", "Ex-Showroom Price"],
+    "option_msrp_sum": ["option_msrp_sum", "Options Price"]
 }
 
 
@@ -74,6 +101,17 @@ def detect_schema(df: pd.DataFrame) -> Tuple[dict, List[str], List[str]]:
         categorical_candidates.append(schema["fuel_type"])
     if "transmission" in schema:
         categorical_candidates.append(schema["transmission"])
+    # Optional extended categoricals
+    for key in [
+        "variant_trim","generation_code","import_type","drivetrain","transmission_detail",
+        "body_type","adas_level","air_suspension","sunroof","branded_audio","rto_code",
+        "city","state"
+    ]:
+        if key in COLUMN_ALIASES:
+            col = find_first_existing(df, COLUMN_ALIASES[key])
+            if col:
+                schema[key] = col
+                categorical_candidates.append(col)
 
     if "year" in schema:
         numeric_candidates.append(schema["year"])
@@ -81,6 +119,16 @@ def detect_schema(df: pd.DataFrame) -> Tuple[dict, List[str], List[str]]:
         numeric_candidates.append(schema["mileage"])
     if "engine_size" in schema:
         numeric_candidates.append(schema["engine_size"])
+    # Optional extended numerics
+    for key in [
+        "seats","airbags","owners_count","insurance_months_left","warranty_months_left",
+        "tyre_life_pct","ex_showroom_msrp","option_msrp_sum"
+    ]:
+        if key in COLUMN_ALIASES:
+            col = find_first_existing(df, COLUMN_ALIASES[key])
+            if col:
+                schema[key] = col
+                numeric_candidates.append(col)
 
     # Keep only columns present in df
     numeric_features = [c for c in numeric_candidates if c in df.columns]
@@ -89,15 +137,65 @@ def detect_schema(df: pd.DataFrame) -> Tuple[dict, List[str], List[str]]:
     return schema, numeric_features, categorical_features
 
 
+def load_known_categories() -> Tuple[List[str], List[str]]:
+    """Load known brands and models from public/year_brand_model_mapping.json if available.
+    Models in that file include brand prefixes; we strip them when possible.
+    """
+    candidates = [
+        os.path.join(os.getcwd(), "public", "year_brand_model_mapping.json"),
+        os.path.join(os.path.dirname(os.path.dirname(__file__)), "public", "year_brand_model_mapping.json"),
+    ]
+    brands: set[str] = set()
+    models: set[str] = set()
+    for path in candidates:
+        if os.path.exists(path):
+            try:
+                with open(path, "r", encoding="utf-8") as f:
+                    data = json.load(f)
+                for _year, brand_map in data.items():
+                    if isinstance(brand_map, dict):
+                        for brand_name, models_list in brand_map.items():
+                            brands.add(brand_name)
+                            if isinstance(models_list, list):
+                                for m in models_list:
+                                    if isinstance(m, str):
+                                        # Remove leading brand prefix if present
+                                        prefix = f"{brand_name} "
+                                        models.add(m[len(prefix):] if m.startswith(prefix) else m)
+            except Exception:
+                continue
+    return sorted(brands), sorted(models)
+
+
 def build_preprocessor(numeric_features: List[str], categorical_features: List[str]) -> ColumnTransformer:
     numeric_pipeline = Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="median")),
         ("scaler", StandardScaler()),
     ])
 
+    # Prepare stable categories for brand/model to align with frontend dropdowns
+    known_brands, known_models = load_known_categories()
+    categories_per_feature: List[List[str] | None] = []
+    for col in categorical_features:
+        lc = col.lower()
+        if lc in ("make", "brand", "oem") and known_brands:
+            categories_per_feature.append(known_brands)
+        elif lc == "model" and known_models:
+            categories_per_feature.append(known_models)
+        else:
+            categories_per_feature.append(None)
+
+    # Use explicit categories only if every categorical feature has a category list
+    use_explicit = len(categories_per_feature) > 0 and all(c is not None for c in categories_per_feature)
+    onehot = OneHotEncoder(
+        handle_unknown="ignore",
+        sparse_output=False,
+        categories=categories_per_feature if use_explicit else "auto",
+    )
+
     categorical_pipeline = Pipeline(steps=[
         ("imputer", SimpleImputer(strategy="most_frequent")),
-        ("onehot", OneHotEncoder(handle_unknown="ignore", sparse_output=False)),
+        ("onehot", onehot),
     ])
 
     preprocessor = ColumnTransformer(
@@ -174,6 +272,13 @@ def main():
 
     features = numeric_features + categorical_features
     X = df[features].copy()
+
+    # Drop all-empty columns to avoid imputer warnings and noisy features
+    empty_cols = [c for c in X.columns if X[c].isna().all()]
+    if empty_cols:
+        X = X.drop(columns=empty_cols)
+        numeric_features = [c for c in numeric_features if c not in empty_cols]
+        categorical_features = [c for c in categorical_features if c not in empty_cols]
     y = df[target_col].astype(float).values
 
     preprocessor = build_preprocessor(numeric_features, categorical_features)
@@ -207,13 +312,16 @@ def main():
     joblib.dump(preprocessor, os.path.join(args.out, "preprocessor.joblib"))
     joblib.dump(best_model, os.path.join(args.out, "model.joblib"))
 
+    from datetime import datetime
     info = {
         "best_model": best_name,
         "metrics": results,
+        "model_metrics": results,
         "features": {
             "numeric": numeric_features,
             "categorical": categorical_features,
-        }
+        },
+        "training_date": datetime.utcnow().isoformat(),
     }
     with open(os.path.join(args.out, "model_info.json"), "w", encoding="utf-8") as f:
         json.dump(info, f, indent=2)

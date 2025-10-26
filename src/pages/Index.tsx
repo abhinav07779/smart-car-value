@@ -2,6 +2,7 @@ import { CarPricePredictor } from "@/components/CarPricePredictor";
 import { DatasetVisualization } from "@/components/DatasetVisualization";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { Footer } from "@/components/Footer";
+import { LegalDisclaimer } from "@/components/LegalDisclaimer";
 import { Card, CardContent } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Brain, ChartBar, Database } from "lucide-react";
@@ -30,7 +31,7 @@ const Index = () => {
               <span className="block text-primary-glow">Machine Learning</span>
             </h1>
             <p className="text-xl md:text-2xl text-gray-200 max-w-3xl mx-auto">
-              Advanced gradient-boosted trees (XGBoost) model trained on automotive data to predict accurate selling prices 
+              Advanced gradient-boosted trees model trained on automotive data to predict accurate selling prices 
               using brand, year, mileage, and technical specifications
             </p>
             
@@ -39,9 +40,7 @@ const Index = () => {
                 <CardContent className="p-6 text-center">
                   <Brain className="h-12 w-12 mx-auto mb-4 text-primary-glow" />
                   <h3 className="text-lg font-semibold mb-2">XGBoost Model</h3>
-                  <p className="text-sm text-gray-200">
-                    Gradient-boosted trees (XGBoost) for high-accuracy car price predictions
-                  </p>
+                  <p className="text-sm text-gray-200">Gradient-boosted trees for high-accuracy predictions</p>
                 </CardContent>
               </Card>
               
@@ -49,9 +48,7 @@ const Index = () => {
                 <CardContent className="p-6 text-center">
                   <ChartBar className="h-12 w-12 mx-auto mb-4 text-primary-glow" />
                   <h3 className="text-lg font-semibold mb-2">Performance Metrics</h3>
-                  <p className="text-sm text-gray-200">
-                    RMSE evaluation and R² score tracking for model validation
-                  </p>
+                  <p className="text-sm text-gray-200">RMSE evaluation and R² score tracking</p>
                 </CardContent>
               </Card>
               
@@ -59,9 +56,7 @@ const Index = () => {
                 <CardContent className="p-6 text-center">
                   <Database className="h-12 w-12 mx-auto mb-4 text-primary-glow" />
                   <h3 className="text-lg font-semibold mb-2">Rich Dataset</h3>
-                  <p className="text-sm text-gray-200">
-                    Comprehensive automotive data with multiple features and correlations
-                  </p>
+                  <p className="text-sm text-gray-200">Comprehensive automotive data with multiple features</p>
                 </CardContent>
               </Card>
             </div>
@@ -76,13 +71,13 @@ const Index = () => {
             <TabsTrigger value="predictor" className="text-sm">Price Predictor</TabsTrigger>
             <TabsTrigger value="analysis" className="text-sm">Data Analysis</TabsTrigger>
           </TabsList>
-          
           <TabsContent value="predictor" className="space-y-8">
             <CarPricePredictor />
+            <LegalDisclaimer />
           </TabsContent>
-          
           <TabsContent value="analysis" className="space-y-8">
             <DatasetVisualization />
+            <LegalDisclaimer />
           </TabsContent>
         </Tabs>
       </section>

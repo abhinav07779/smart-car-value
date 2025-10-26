@@ -43,6 +43,31 @@ class PredictRequest(BaseModel):
     state: Optional[str] = None
     cngKit: Optional[bool] = None
     qualityScore: Optional[float] = None
+    # Extended optional fields to align with new training features
+    variant_trim: Optional[str] = None
+    generation_code: Optional[str] = None
+    import_type: Optional[str] = None
+    drivetrain: Optional[str] = None
+    transmission_detail: Optional[str] = None
+    body_type: Optional[str] = None
+    seats: Optional[float] = None
+    adas_level: Optional[str] = None
+    airbags: Optional[float] = None
+    air_suspension: Optional[str] = None
+    sunroof: Optional[str] = None
+    branded_audio: Optional[str] = None
+    owners_count: Optional[float] = None
+    insurance_months_left: Optional[float] = None
+    warranty_months_left: Optional[float] = None
+    tyre_life_pct: Optional[float] = None
+    accident_history: Optional[str] = None
+    flood_history: Optional[str] = None
+    odometer_tamper: Optional[str] = None
+    service_history_complete: Optional[str] = None
+    recall_fixed: Optional[str] = None
+    rto_code: Optional[str] = None
+    ex_showroom_msrp: Optional[float] = None
+    option_msrp_sum: Optional[float] = None
 
 class PredictResponse(BaseModel):
     predictedPrice: float
@@ -106,6 +131,33 @@ ALIASES: Dict[str, List[str]] = {
     "fuelType": ["fuelType", "fuel_type", "Fuel Type", "ft", "fuel"],
     "transmission": ["transmission", "Transmission"],
     "engineSize": ["engineSize", "engine_size", "Engine Displacement", "engine", "Displacement"],
+    # extended
+    "variant_trim": ["variant_trim", "variant", "variantName", "Variant", "trim"],
+    "generation_code": ["generation_code", "generation", "gen_code"],
+    "import_type": ["import_type", "importType", "CBU_CKD", "cbu_ckd"],
+    "drivetrain": ["drivetrain", "Drive Type", "drive_type", "AWD_RWD_FWD"],
+    "transmission_detail": ["transmission_detail", "gearbox", "Transmission Detail"],
+    "body_type": ["body_type", "Body Type", "body"],
+    "seats": ["seats", "Seating Capacity"],
+    "adas_level": ["adas_level", "ADAS", "adas"],
+    "airbags": ["airbags", "Airbags"],
+    "air_suspension": ["air_suspension", "Air Suspension"],
+    "sunroof": ["sunroof", "Panoramic Sunroof", "Sunroof"],
+    "branded_audio": ["branded_audio", "Audio Brand"],
+    "owners_count": ["owners_count", "ownerNo", "Owners", "No. of Owners"],
+    "insurance_months_left": ["insurance_months_left", "Insurance Months Left"],
+    "warranty_months_left": ["warranty_months_left", "Warranty Months Left"],
+    "tyre_life_pct": ["tyre_life_pct", "Tyre Life %"],
+    "accident_history": ["accident_history", "Accident History"],
+    "flood_history": ["flood_history", "Flood History"],
+    "odometer_tamper": ["odometer_tamper", "Odometer Tamper"],
+    "service_history_complete": ["service_history_complete", "Service History Complete"],
+    "recall_fixed": ["recall_fixed", "Recall Fixed"],
+    "rto_code": ["rto_code", "RTO", "Registration RTO"],
+    "city": ["City", "city"],
+    "state": ["state", "State"],
+    "ex_showroom_msrp": ["ex_showroom_msrp", "Ex-Showroom Price"],
+    "option_msrp_sum": ["option_msrp_sum", "Options Price"],
 }
 
 
@@ -152,6 +204,33 @@ async def predict(req: PredictRequest):
         pick_trained_name(trained_cols, ALIASES["fuelType"]): req.fuelType,
         pick_trained_name(trained_cols, ALIASES["transmission"]): req.transmission,
         pick_trained_name(trained_cols, ALIASES["engineSize"]): coerce_numeric(req.engineSize),
+        # extended (will only be included if used in training)
+        pick_trained_name(trained_cols, ALIASES["variant_trim"]): req.variant_trim,
+        pick_trained_name(trained_cols, ALIASES["generation_code"]): req.generation_code,
+        pick_trained_name(trained_cols, ALIASES["import_type"]): req.import_type,
+        pick_trained_name(trained_cols, ALIASES["drivetrain"]): req.drivetrain,
+        pick_trained_name(trained_cols, ALIASES["transmission_detail"]): req.transmission_detail,
+        pick_trained_name(trained_cols, ALIASES["body_type"]): req.body_type,
+        pick_trained_name(trained_cols, ALIASES["seats"]): coerce_numeric(req.seats),
+        pick_trained_name(trained_cols, ALIASES["adas_level"]): req.adas_level,
+        pick_trained_name(trained_cols, ALIASES["airbags"]): coerce_numeric(req.airbags),
+        pick_trained_name(trained_cols, ALIASES["air_suspension"]): req.air_suspension,
+        pick_trained_name(trained_cols, ALIASES["sunroof"]): req.sunroof,
+        pick_trained_name(trained_cols, ALIASES["branded_audio"]): req.branded_audio,
+        pick_trained_name(trained_cols, ALIASES["owners_count"]): coerce_numeric(req.owners_count),
+        pick_trained_name(trained_cols, ALIASES["insurance_months_left"]): coerce_numeric(req.insurance_months_left),
+        pick_trained_name(trained_cols, ALIASES["warranty_months_left"]): coerce_numeric(req.warranty_months_left),
+        pick_trained_name(trained_cols, ALIASES["tyre_life_pct"]): coerce_numeric(req.tyre_life_pct),
+        pick_trained_name(trained_cols, ALIASES["accident_history"]): req.accident_history,
+        pick_trained_name(trained_cols, ALIASES["flood_history"]): req.flood_history,
+        pick_trained_name(trained_cols, ALIASES["odometer_tamper"]): req.odometer_tamper,
+        pick_trained_name(trained_cols, ALIASES["service_history_complete"]): req.service_history_complete,
+        pick_trained_name(trained_cols, ALIASES["recall_fixed"]): req.recall_fixed,
+        pick_trained_name(trained_cols, ALIASES["rto_code"]): req.rto_code,
+        pick_trained_name(trained_cols, ALIASES["city"]): req.city,
+        pick_trained_name(trained_cols, ALIASES["state"]): req.state,
+        pick_trained_name(trained_cols, ALIASES["ex_showroom_msrp"]): coerce_numeric(req.ex_showroom_msrp),
+        pick_trained_name(trained_cols, ALIASES["option_msrp_sum"]): coerce_numeric(req.option_msrp_sum),
     }
 
     # Remove None keys (aliases not used in training)

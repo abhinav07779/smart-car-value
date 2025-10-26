@@ -3,33 +3,60 @@
   "metrics": [
     {
       "model": "LinearRegression",
-      "rmse": 543925309348214.75,
-      "mae": 36992027700350.45,
-      "r2": -2.3009175450217114e+18
+      "rmse": 725102345956906.8,
+      "mae": 115352647124343.88,
+      "r2": -3.330085025613882e+18
     },
     {
       "model": "RandomForest",
-      "rmse": 136576.07639507772,
-      "mae": 88734.58564973004,
-      "r2": 0.854931946136605
+      "rmse": 76228.14037928953,
+      "mae": 34007.115519683575,
+      "r2": 0.9631966499838273
     },
     {
       "model": "XGBRegressor",
-      "rmse": 130350.11536358682,
-      "mae": 86414.59568883067,
-      "r2": 0.8678566353657183
+      "rmse": 71771.89979257934,
+      "mae": 32796.112837116234,
+      "r2": 0.9673738682164258
+    }
+  ],
+  "model_metrics": [
+    {
+      "model": "LinearRegression",
+      "rmse": 725102345956906.8,
+      "mae": 115352647124343.88,
+      "r2": -3.330085025613882e+18
+    },
+    {
+      "model": "RandomForest",
+      "rmse": 76228.14037928953,
+      "mae": 34007.115519683575,
+      "r2": 0.9631966499838273
+    },
+    {
+      "model": "XGBRegressor",
+      "rmse": 71771.89979257934,
+      "mae": 32796.112837116234,
+      "r2": 0.9673738682164258
     }
   ],
   "features": {
     "numeric": [
-      "modelYear",
-      "mileage"
+      "year",
+      "mileage",
+      "owners_count"
     ],
     "categorical": [
-      "oem",
+      "make",
       "model",
-      "ft",
-      "transmission"
+      "fuel_type",
+      "transmission",
+      "variant_trim",
+      "import_type",
+      "drivetrain",
+      "adas_level",
+      "city"
     ]
-  }
+  },
+  "training_date": "2025-10-16T08:12:36.907789"
 }
